@@ -866,7 +866,7 @@ const AddOrder = () => {
         const undefinedOrEmptyFields = updateOrder?.flatMap(item => findUndefinedOrEmptyFields(item));
 
         if (undefinedOrEmptyFields.length < 1) {
-          orderRef = doc(firestore, "orders", newOrderId)
+          orderRef = doc(firestore, "orders-midtrans", newOrderId)
           // update shipping date
           const shippingDate = `${formData?.year.toString()}-${formData?.month.toString().padStart(2, '0')}-${formData?.day.toString().padStart(2, '0')}`
           const shippingDateTimestamp = Timestamp.fromDate(new Date(shippingDate));
@@ -911,13 +911,14 @@ const AddOrder = () => {
             isInvWASent: true
 
           }, { merge: true });
-          const contactRef = await setDoc(doc(firestore, "contact", formData?.senderPhone), { createdAt: serverTimestamp(), nama: formData.senderName, phone: formData.senderPhone, email: formData?.email || '', type: 'sender' });
+          window.open(result.data.items?.redirect_url)
+          // const contactRef = await setDoc(doc(firestore, "contact", formData?.senderPhone), { createdAt: serverTimestamp(), nama: formData.senderName, phone: formData.senderPhone, email: formData?.email || '', type: 'sender' });
 
-          await Promise.all(orders?.map?.(async (data) => {
+          // await Promise.all(orders?.map?.(async (data) => {
 
 
-            await setDoc(doc(firestore, "contact", data?.receiverPhone), { createdAt: serverTimestamp(), nama: data.receiverName, phone: data.receiverPhone, email: '', type: 'receiver' });
-          }));
+          //   await setDoc(doc(firestore, "contact", data?.receiverPhone), { createdAt: serverTimestamp(), nama: data.receiverName, phone: data.receiverPhone, email: '', type: 'receiver' });
+          // }));
         } else {
           enqueueSnackbar(`order gagal dibuat, ada field yg undefined, ${undefinedOrEmptyFields}`, { variant: 'error' })
         }
@@ -931,21 +932,22 @@ const AddOrder = () => {
 
       setLoading(false)
       setModalShow(false)
-      enqueueSnackbar(`order berhasil dibuat`, { variant: 'success' })
+      enqueueSnackbar(`order berhasil dibuat`, { variant: 'success' });
+      window.location.reload();
     } catch (e) {
-      if (orderRef) {
-        try {
-          await deleteDoc(orderRef);
-          console.log("Document deleted from Firestore due to Qontak API error");
-        } catch (deleteError) {
-          console.error("Error deleting document:", deleteError);
-        }
-      }
+      // if (orderRef) {
+      //   try {
+      //     await deleteDoc(orderRef);
+      //     console.log("Document deleted from Firestore due to Qontak API error");
+      //   } catch (deleteError) {
+      //     console.error("Error deleting document:", deleteError);
+      //   }
+      // }
       enqueueSnackbar(`order gagal dibuat, ${e.message}`, { variant: 'error' })
 
       console.log('error', e)
       setLoading(false)
-      window.location.reload();
+
     }
   }
 
